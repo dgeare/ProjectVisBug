@@ -1,6 +1,6 @@
 import $ from 'blingblingjs'
 import hotkeys from 'hotkeys-js'
-import { getStyle } from '../utilities/'
+import { getStyle, userKeys } from '../utilities/'
 
 const key_events = 'up,down,left,right'
   .split(',')
@@ -9,9 +9,10 @@ const key_events = 'up,down,left,right'
   , '')
   .substring(1)
 
-const command_events = 'cmd+up,cmd+down,cmd+left,cmd+right'
+const getCommandEvents = () => `${userKeys.cmd}+up,${userKeys.cmd}+down,${userKeys.cmd}+left,${userKeys.cmd}+right`
 
 export function Flex(selector) {
+  const command_events = getCommandEvents();
   hotkeys(key_events, (e, handler) => {
     if (e.cancelBubble) return
       

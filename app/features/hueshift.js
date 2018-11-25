@@ -2,7 +2,7 @@ import $ from 'blingblingjs'
 import hotkeys from 'hotkeys-js'
 import { TinyColor } from '@ctrl/tinycolor'
 
-import { getStyle, showHideSelected } from '../utilities/'
+import { getStyle, showHideSelected, userKeys } from '../utilities/'
 
 const key_events = 'up,down,left,right'
   .split(',')
@@ -11,9 +11,11 @@ const key_events = 'up,down,left,right'
   , '')
   .substring(1)
 
-const command_events = 'cmd+up,cmd+shift+up,cmd+down,cmd+shift+down,cmd+left,cmd+shift+left,cmd+right,cmd+shift+right'
+const getCommandEvents = () => `${userKeys.cmd}+up,${userKeys.cmd}+shift+up,${userKeys.cmd}+down,${userKeys.cmd}+shift+down,${userKeys.cmd}+left,${userKeys.cmd}+shift+left,${userKeys.cmd}+right,${userKeys.cmd}+shift+right`
+
 
 export function HueShift(Color) {
+  const command_events = getCommandEvents();
   this.active_color = Color.getActive()
 
   hotkeys(key_events, (e, handler) => {

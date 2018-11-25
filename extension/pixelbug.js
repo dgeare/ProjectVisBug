@@ -4,6 +4,7 @@ let state = {
 }
 
 chrome.browserAction.onClicked.addListener(function(tab) {
+  
   if (state.loaded[tab.id] && state.injected[tab.id]) {
     chrome.tabs.executeScript(tab.id, { file: 'toolbar/eject.js' })
     state.injected[tab.id] = false
@@ -17,6 +18,13 @@ chrome.browserAction.onClicked.addListener(function(tab) {
     chrome.tabs.executeScript(tab.id, { file: 'web-components.polyfill.js' })
     chrome.tabs.executeScript(tab.id, { file: 'toolbar/bundle.js' })
     chrome.tabs.executeScript(tab.id, { file: 'toolbar/inject.js' })
+    
+    chrome.runtime.getPlatformInfo(info => {
+      const message = {
+        os : info.os
+      };
+      chrome.tabs.sendMessage(tab.id, message);
+    });
 
     state.loaded[tab.id]    = true
     state.injected[tab.id]  = true

@@ -1,6 +1,6 @@
 import $ from 'blingblingjs'
 import hotkeys from 'hotkeys-js'
-import { getStyle, getSide, showHideSelected } from '../utilities/'
+import { getStyle, getSide, showHideSelected, userKeys } from '../utilities/'
 
 // todo: show padding color
 const key_events = 'up,down,left,right'
@@ -10,9 +10,10 @@ const key_events = 'up,down,left,right'
   , '')
   .substring(1)
 
-const command_events = 'cmd+up,cmd+shift+up,cmd+down,cmd+shift+down'
+const getCommandEvents = () => `${userKeys.cmd}+up,${userKeys.cmd}+shift+up,${userKeys.cmd}+down,${userKeys.cmd}+shift+down`
 
 export function Padding(selector) {
+  const command_events = getCommandEvents()
   hotkeys(key_events, (e, handler) => {
     if (e.cancelBubble) return
       
