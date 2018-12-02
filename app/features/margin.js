@@ -1,16 +1,22 @@
 import $ from 'blingblingjs'
 import hotkeys from 'hotkeys-js'
-import { getStyle, getSide, showHideSelected } from '../utilities/'
+import { getStyle, getSide, showHideSelected, keys } from '../utilities/'
 
+console.log(`${keys().up.plus.cmd},${keys().down.plus.shift}`);//this pattern works also
 // todo: show margin color
-const key_events = 'up,down,left,right'
-  .split(',')
+const key_events = keys().up.down.left.right.array()
   .reduce((events, event) => 
-    `${events},${event},alt+${event},shift+${event},shift+alt+${event}`
-  , '')
+    events.comma[event].comma.alt.plus[event].comma.shift.plus[event].comma.shift.plus.alt.plus[event]
+  , keys())
+  .string()
   .substring(1)
 
-const command_events = 'cmd+up,cmd+shift+up,cmd+down,cmd+shift+down'
+const command_events = [
+  keys().cmd.plus.up.string(),
+  keys().cmd.plus.shift.plus.up.string(),
+  keys().cmd.plus.down.string(),
+  keys().cmd.plus.shift.plus.down.string()
+].join()
 
 export function Margin(selector) {
   hotkeys(key_events, (e, handler) => {
@@ -28,7 +34,7 @@ export function Margin(selector) {
   return () => {
     hotkeys.unbind(key_events)
     hotkeys.unbind(command_events)
-    hotkeys.unbind('up,down,left,right') // bug in lib?
+    hotkeys.unbind(keys().up.down.left.right.array().join()) // bug in lib?
   }
 }
 
@@ -39,8 +45,8 @@ export function pushElement(els, direction) {
       el, 
       style:    'margin' + getSide(direction),
       current:  parseInt(getStyle(el, 'margin' + getSide(direction)), 10),
-      amount:   direction.split('+').includes('shift') ? 10 : 1,
-      negative: direction.split('+').includes('alt'),
+      amount:   direction.split('+').includes(keys().shift.string()) ? 10 : 1,
+      negative: direction.split('+').includes(keys().alt.string()),
     }))
     .map(payload =>
       Object.assign(payload, {
@@ -54,11 +60,12 @@ export function pushElement(els, direction) {
 
 export function pushAllElementSides(els, keycommand) {
   const combo = keycommand.split('+')
-  let spoof = ''
-
-  if (combo.includes('shift'))  spoof = 'shift+' + spoof
-  if (combo.includes('down'))   spoof = 'alt+' + spoof
-
-  'up,down,left,right'.split(',')
-    .forEach(side => pushElement(els, spoof + side))
+  
+  keys().up.down.left.right.array()
+    .forEach(side => {
+      let cur = keys();
+      if (combo.includes(keys().shift.string()))  cur = cur.shift.plus
+      if (combo.includes(keys().down.string()))   cur = cur.alt.plus
+      pushElement(els, cur[side].string())
+    });
 }
