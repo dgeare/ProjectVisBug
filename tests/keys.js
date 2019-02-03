@@ -11,12 +11,11 @@ test('arrows is as expected', t => {
 test('keyEvents concatenates an array with shift', t => {
   const keys = makeKeyUtils();
   const events = keys.keyEvents(["up","down"], "shift");
-  t.true(events === "up,down,up+shift,down+shift");
+  t.true(events.join(',') === "up,down,up+shift,down+shift");
 })
 
 test('keyEvents concatenates an array with [shift,alt]', t => {
   const keys = makeKeyUtils();
   const events = keys.keyEvents(["up"], ["shift","alt"]);
-  console.log(events)
-  t.true(events === "up,up+shift,up+alt,up+shift+alt");
+  t.true(events.join(',') === "up,up+shift,up+alt,up+shift+alt");
 })
