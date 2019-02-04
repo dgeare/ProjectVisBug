@@ -1,10 +1,4 @@
-//@todo extract defaults into a helper lib and include all common keys
-const defaults = {
-  up : 'up',
-  left : 'left',
-  down : 'down',
-  right : 'right'
-}
+import {keyDefaults} from './keyMap.js';
 
 /**
  * Factory function which returns a keys utility. Dependency injects a mapping object to specify
@@ -32,7 +26,7 @@ const defaults = {
  *
  * @param {Object} keys Overriding map for the keymap object
  */
-export const makeKeyUtils = (keys = defaults) => {
+export const makeKeyUtils = (keys = keyDefaults) => {
 	class kUtil{
         keyEvents(iterator = [], add = [], {includeOriginal = true, asString = false} = {}){
 			if(!Array.isArray(add)){
