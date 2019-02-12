@@ -52,7 +52,7 @@ const onDragEnter = e => {
       showOverlay(img, i))
 }
 
-const onDragLeave = e => 
+const onDragLeave = e =>
   hideOverlays()
 
 const onDrop = async e => {
@@ -61,16 +61,17 @@ const onDrop = async e => {
 
   const selectedImages = $('img[data-selected=true]')
 
-  const srcs = await Promise.all(
-    [...e.dataTransfer.files].map(previewFile))
-  
+  const srcs = e.dataTransfer.files.length ? await Promise.all([...e.dataTransfer.files].map(previewFile))
+    : [e.srcElement.src]
+
+
   if (!selectedImages.length)
     if (e.target.nodeName === 'IMG')
       e.target.src = srcs[0]
     else
       imgs
         .filter(img => img.contains(e.target))
-        .forEach(img => 
+        .forEach(img =>
           img.style.backgroundImage = `url(${srcs[0]})`)
   else if (selectedImages.length) {
     let i = 0
