@@ -10,7 +10,7 @@ import {
 import {
   Selectable, Moveable, Padding, Margin, EditText, Font,
   Flex, Search, ColorPicker, BoxShadow, HueShift, MetaTip,
-  Guides, Screenshot, Position, Accessibility
+  Guides, Screenshot, Position, Accessibility, draggable
 } from '../../features/'
 
 import { VisBugModel }              from './model'
@@ -52,6 +52,8 @@ export default class VisBug extends HTMLElement {
     $('li[data-tool]', this.$shadow).on('click', e =>
       this.toolSelected(e.currentTarget) && e.stopPropagation())
 
+    this.setupDragHandle()
+
     Object.entries(this.toolbar_model).forEach(([key, value]) =>
       hotkeys(key, e => {
         e.preventDefault()
@@ -68,6 +70,33 @@ export default class VisBug extends HTMLElement {
           : 'none')
 
     this.toolSelected($('[data-tool="guides"]', this.$shadow)[0])
+  }
+
+  setupDragHandle(){
+    let dragBound = false;
+    let draggableState;
+    $('#palette_handle', this.$shadow).on('mouseenter', (e) => {
+      if(dragBound) return;
+      dragBound = true;
+      draggable(this, {
+        callback : (e, state) => {
+          draggableState = state
+          if(this.getBoundingClientRect().left > window.innerWidth/2){
+            this.setAttribute('right-side','')
+          }else{
+            this.removeAttribute('right-side')
+          }
+        },
+        context:this
+      })
+    })
+
+    $('#palette_handle', this.$shadow).on('mouseleave', (e) => {
+      if(draggableState && ! draggableState.mouse.down && dragBound){
+        this.teardown()
+        dragBound = false
+      }
+    })
   }
 
   cleanup() {
@@ -104,6 +133,7 @@ export default class VisBug extends HTMLElement {
       ${this.styles()}
       <visbug-hotkeys></visbug-hotkeys>
       <ol>
+        <li id='palette_handle'><span id='handle_dot'></span></li>
         ${Object.entries(this.toolbar_model).reduce((list, [key, tool]) => `
           ${list}
           <li aria-label="${tool.label} Tool" aria-description="${tool.description}" aria-hotkey="${key}" data-tool="${tool.tool}" data-active="${key == 'g'}">

@@ -151,6 +151,44 @@
   }
 }
 
+:host([right-side]) li > aside{
+  left:initial;
+  right:3em;
+}
+
+
+:host #palette_handle{
+  width:100%;
+  height:6px;
+  display:block;
+  margin:.7em 0 .2em 0;
+  cursor:move;
+  border-radius:0;
+}
+#handle_dot, #handle_dot:before, #handle_dot:after{
+  display:block;
+  background:#ababab;
+  width:5px;
+  height:5px;
+  border-radius:50px;
+}
+
+#handle_dot{
+  position:relative;
+  margin:0 auto;
+}
+#handle_dot:before, #handle_dot:after{
+  position: absolute;
+  content:'';
+}
+#handle_dot:before{
+  transform:translateX(-10px);
+}
+#handle_dot:after{
+  transform:translateX(10px);
+}
+
+
 :host [colors] {
   margin-top: 0;
 }
