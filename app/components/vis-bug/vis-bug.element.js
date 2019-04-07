@@ -39,6 +39,7 @@ export default class VisBug extends HTMLElement {
   disconnectedCallback() {
     this.deactivate_feature()
     this.cleanup()
+    this.cleanupDragHandle()
     this.selectorEngine.disconnect()
     hotkeys.unbind(
       Object.keys(this.toolbar_model).reduce((events, key) =>
@@ -73,46 +74,58 @@ export default class VisBug extends HTMLElement {
   }
 
   setupDragHandle(){
-    let draggableState;
-    const paletteHandle = this.$shadow.querySelector('#palette_handle');
+    this.draggableState;
+    this.paletteHandle = this.$shadow.querySelector('#palette_handle')
+    //bind callback methods to instance for this context
+    this._paletteEnterHandler = this._paletteEnterHandler.bind(this)
+    this._paletteLeaveHandler = this._paletteLeaveHandler.bind(this)
 
-    const listenNextHandleEnter = () => {
-      paletteHandle.addEventListener('mouseenter',(e) => {
-        //make tool palette draggable
-        draggable(this, {
-          callback : (e, state) => {
-            //pass state to outer closure
-            draggableState = state
-            //adjust the tip cards appropriately
-            if(this.getBoundingClientRect().left > window.innerWidth/2){
-              this.setAttribute('right-side','')
-            }else{
-              this.removeAttribute('right-side')
-            }
-          },
-          context:this
-        })
-        //listen for leave && ! in drag for teardown
-        listenMouseLeaveTearDown()
-      }, {once : true})
-    }
+    this.listenNextHandleEnter();
+  }
 
-    const listenMouseLeaveTearDown = () => {
-      const mouseLeaveHandler = (e) => {
-        if(draggableState && ! draggableState.mouse.down){
-          //teardown draggable
-          this.teardown()
-          //remove listener (self)
-          paletteHandle.removeEventListener('mouseleave', mouseLeaveHandler)
-          //setup next time mouse enters handle
-          listenNextHandleEnter()
+  cleanupDragHandle(){
+    this.paletteHandle.removeEventListener('mouseenter', this._paletteEnterHandler)
+    this.paletteHandle.removeEventListener('mouseenter', this._paletteLeaveHandler)
+    if(this.teardown) this.teardown()
+  }
+
+  listenNextHandleEnter(){
+    this.paletteHandle.addEventListener('mouseenter',this._paletteEnterHandler, {once : true})
+  }
+
+  _paletteEnterHandler(e){
+    //make tool palette draggable
+    draggable(this, {
+      callback : (e, state) => {
+        //pass state to outer closure
+        this.draggableState = state
+        //adjust the tip cards appropriately
+        if(this.getBoundingClientRect().left > window.innerWidth/2){
+          this.setAttribute('right-side','')
+        }else{
+          this.removeAttribute('right-side')
         }
-      }
+      },
+      context:this
+    })
+    //listen for leave && ! in drag for teardown
+    this.listenMouseLeaveTearDown()
+  }
 
-      paletteHandle.addEventListener('mouseleave', mouseLeaveHandler)
+  listenMouseLeaveTearDown(){
+    this.paletteHandle.addEventListener('mouseleave', this._paletteLeaveHandler)
+  }
+
+  _paletteLeaveHandler(e){
+    if(this.draggableState && ! this.draggableState.mouse.down){
+      //teardown draggable
+      this.teardown()
+      this.teardown = undefined
+      //remove listener (self)
+      this.paletteHandle.removeEventListener('mouseleave', this._paletteLeaveHandler)
+      //setup next time mouse enters handle
+      this.listenNextHandleEnter()
     }
-
-    listenNextHandleEnter();
   }
 
   cleanup() {
