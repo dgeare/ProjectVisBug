@@ -73,30 +73,46 @@ export default class VisBug extends HTMLElement {
   }
 
   setupDragHandle(){
-    let dragBound = false;
     let draggableState;
-    $('#palette_handle', this.$shadow).on('mouseenter', (e) => {
-      if(dragBound) return;
-      dragBound = true;
-      draggable(this, {
-        callback : (e, state) => {
-          draggableState = state
-          if(this.getBoundingClientRect().left > window.innerWidth/2){
-            this.setAttribute('right-side','')
-          }else{
-            this.removeAttribute('right-side')
-          }
-        },
-        context:this
-      })
-    })
+    const paletteHandle = this.$shadow.querySelector('#palette_handle');
 
-    $('#palette_handle', this.$shadow).on('mouseleave', (e) => {
-      if(draggableState && ! draggableState.mouse.down && dragBound){
-        this.teardown()
-        dragBound = false
+    const listenNextHandleEnter = () => {
+      paletteHandle.addEventListener('mouseenter',(e) => {
+        //make tool palette draggable
+        draggable(this, {
+          callback : (e, state) => {
+            //pass state to outer closure
+            draggableState = state
+            //adjust the tip cards appropriately
+            if(this.getBoundingClientRect().left > window.innerWidth/2){
+              this.setAttribute('right-side','')
+            }else{
+              this.removeAttribute('right-side')
+            }
+          },
+          context:this
+        })
+        //listen for leave && ! in drag for teardown
+        listenMouseLeaveTearDown()
+      }, {once : true})
+    }
+
+    const listenMouseLeaveTearDown = () => {
+      const mouseLeaveHandler = (e) => {
+        if(draggableState && ! draggableState.mouse.down){
+          //teardown draggable
+          this.teardown()
+          //remove listener (self)
+          paletteHandle.removeEventListener('mouseleave', mouseLeaveHandler)
+          //setup next time mouse enters handle
+          listenNextHandleEnter()
+        }
       }
-    })
+
+      paletteHandle.addEventListener('mouseleave', mouseLeaveHandler)
+    }
+
+    listenNextHandleEnter();
   }
 
   cleanup() {
