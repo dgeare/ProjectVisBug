@@ -1,6 +1,6 @@
 import test from 'ava'
 
-import { setupPptrTab, teardownPptrTab, getActiveTool } 
+import { setupPptrTab, teardownPptrTab, getActiveTool }
 from '../../../tests/helpers'
 
 test.beforeEach(setupPptrTab)
@@ -15,7 +15,7 @@ test('Should have 13 tools', async t => {
   const { page } = t.context
   const tools = await page.evaluate(`document.querySelector('vis-bug').$shadow.querySelectorAll('ol:first-of-type > li').length`)
 
-  t.is(tools, 13)
+  t.is(tools, 14)
   t.pass()
 })
 

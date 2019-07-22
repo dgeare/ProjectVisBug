@@ -9,7 +9,8 @@ import {
 import {
   Selectable, Moveable, Padding, Margin, EditText, Font,
   Flex, Search, ColorPicker, BoxShadow, HueShift, MetaTip,
-  Guides, Screenshot, Position, Accessibility, draggable
+  Guides, Screenshot, Position, Accessibility, draggable,
+  Border
 } from '../../features/'
 
 import { VisBugStyles }           from '../styles.store'
@@ -224,6 +225,10 @@ export default class VisBug extends HTMLElement {
       this.selectorEngine.removeSelectedCallback(feature.onNodesSelected)
       feature.disconnect()
     }
+  }
+
+  border() {
+    this.deactivate_feature = Border(this.selectorEngine)
   }
 
   get activeTool() {

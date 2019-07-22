@@ -240,6 +240,38 @@ export const VisBugModel = {
                     </div>
                   </div>`,
   },
+  b: {
+    tool:         'border',
+    icon:         Icons.border,
+    label:        'Border',
+    description:  'Change width, radius, color',
+    instruction:  `<div table>
+                    <div>
+                      <b>+ Width:</b>
+                      <span>◀ ▶ ▲ ▼</span>
+                    </div>
+                    <div>
+                      <b>- Width:</b>
+                      <span>Alt + ◀ ▶ ▲ ▼</span>
+                    </div>
+                    <div>
+                      <b>Width all sides:</b>
+                      <span>${metaKey} + ◀ ▶ ▲ ▼</span>
+                    </div>
+                    <div>
+                      <b>+ Radius:</b>
+                      <span>Shift + ◀ ▶ ▲ ▼</span>
+                    </div>
+                    <div>
+                      <b>- Radius:</b>
+                      <span>Alt + Shift + ◀ ▶ ▲ ▼</span>
+                    </div>
+                    <div>
+                      <b>Radius all sides:</b>
+                      <span>${metaKey} + Shift + ◀ ▶ ▲ ▼</span>
+                    </div>
+                  </div>`,
+  },
   e: {
     tool:        'text',
     icon:        Icons.text,
