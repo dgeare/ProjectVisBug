@@ -42,7 +42,6 @@ export function showEdge(el) {
 
 let timeoutMap = {}
 export const showHideSelected = (el, duration = 750) => {
-  console.log(el)
   el.setAttribute('data-selected-hide', true)
   showHideNodeLabel(el, true)
 
