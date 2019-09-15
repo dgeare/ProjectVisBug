@@ -6,7 +6,7 @@ export const getStyle = (el, name) => {
     name = name.toLowerCase()
     let s = document.defaultView.getComputedStyle(el, '')
     return s && s.getPropertyValue(name)
-  } 
+  }
 }
 
 export const getStyles = el => {
@@ -18,7 +18,7 @@ export const getStyles = el => {
     .filter(([prop]) => desiredPropMap[prop])
     .filter(([prop]) => desiredPropMap[prop] != computedStyle[prop])
     .map(([prop, value]) => ({
-      prop, 
+      prop,
       value: computedStyle[prop].replace(/, rgba/g, '\rrgba'),
     }))
 
@@ -28,7 +28,7 @@ export const getStyles = el => {
   const trueBorderColors = Object.entries(el.style)
     .filter(([prop]) => prop === 'borderColor' || prop === 'borderWidth' || prop === 'borderStyle')
     .map(([prop, value]) => ([
-      prop, 
+      prop,
       computedStyle[prop].replace(/, rgba/g, '\rrgba'),
     ]))
 
@@ -49,7 +49,7 @@ export const getStyles = el => {
   }
 
   return [
-    ...vettedStyles, 
+    ...vettedStyles,
     ...vettedBorders,
   ].sort(function({prop:propA}, {prop:propB}) {
     if (propA < propB) return -1
@@ -95,7 +95,7 @@ export const findNearestParentElement = el =>
 export const findNearestChildElement = el => {
   if (el.shadowRoot && el.shadowRoot.children.length) {
     return [...el.shadowRoot.children]
-      .filter(({nodeName}) => 
+      .filter(({nodeName}) =>
         !['LINK','STYLE','SCRIPT','HTML','HEAD'].includes(nodeName)
       )[0]
   }
@@ -108,7 +108,7 @@ export const loadStyles = async stylesheets => {
   const texts   = await Promise.all(fetches.map(url => url.text()))
   const style   = document.createElement('style')
 
-  style.textContent = texts.reduce((styles, fileContents) => 
+  style.textContent = texts.reduce((styles, fileContents) =>
     styles + fileContents
   , '')
 
@@ -122,3 +122,29 @@ export const getShadowValues = shadow =>
 // returns [full, color, x, y, blur]
 export const getTextShadowValues = shadow =>
   /([^\)]+\)) ([^\s]+) ([^\s]+) ([^\s]+)/.exec(shadow)
+
+export const getBorderWidths = el => {
+  const [t,r,b,l] = getStyle(el, 'border-width').split(' ')
+  const [top,right,bottom,left] = [t,r,b,l].map(function recursiveRetrieveValue(v,i,arr){
+    if(arr[i] === undefined){
+      //recursively retrieve the value at lower index as the browser condenses representation of the style
+      return recursiveRetrieveValue(undefined,(i-1)>>1,arr)
+    }
+    return parseInt(arr[i])
+  })
+
+  return { top, right, bottom, left }
+}
+
+export const getBorderRadii = el => {
+  const [t,r,b,l] = getStyle(el, 'border-radius').split(' ')
+  const [topLeft,topRight,bottomRight,bottomLeft] = [t,r,b,l].map(function recursiveRetrieveValue(v,i,arr){
+    if(arr[i] === undefined){
+      //recursively retrieve the value at lower index as the browser condenses representation of the style
+      return recursiveRetrieveValue(undefined,(i-1)>>1,arr)
+    }
+    return parseInt(arr[i])
+  })
+
+  return { topLeft, topRight, bottomRight, bottomLeft }
+}

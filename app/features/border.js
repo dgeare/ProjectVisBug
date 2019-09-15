@@ -1,5 +1,5 @@
 import hotkeys from 'hotkeys-js'
-import { metaKey, getStyle, getStyles, getSide, showHideSelected } from '../utilities/'
+import { metaKey, getStyle, getStyles, getSide, sideToCorner, showHideSelected, getBorderRadii, getBorderWidths } from '../utilities/'
 
 const key_events = 'up,down,left,right'
   .split(',')
@@ -15,25 +15,20 @@ export function Border(visbug) {
   const accelerate = (fn, ctx = null) => {
     let last = 0
     let mod = 1
-    let step = 0;
     return async (...args) => {
       if(performance.now() - last < 100){
-        // if(step++ % 10 == 0)
           mod++
       }else{
         mod = 1
-        step = 0;
       }
       last = performance.now()
-      console.log(mod)
-      console.log(Math.log2(mod))
       fn.apply(ctx,  [...args,Math.floor(Math.log2(mod * 2))])
 
     }
   }
 
   hotkeys(key_events, accelerate((e, handler, mod) => {
-    e.preventDefault();
+    e.preventDefault()
     if(handler.key.includes('shift')){
       modifyRadius(visbug.selection(), handler.key, mod)
     }else{
@@ -43,7 +38,7 @@ export function Border(visbug) {
   }))
 
   hotkeys(command_events, accelerate((e, handler, mod) => {
-    e.preventDefault();
+    e.preventDefault()
     if(handler.key.includes('shift')){
       modifyRadiiAll(visbug.selection(), handler.key, mod)
     }else{
@@ -95,9 +90,9 @@ const modifyRadius = (els, keys, mod) => {
 
       const borderRadii = getBorderRadii(el)
 
-      borderRadii[getSide(keys).toLowerCase()] += sign * mod
+      borderRadii[sideToCorner(getSide(keys))] += sign * mod
 
-      el.style.borderRadius = `${borderRadii.top}px ${borderRadii.right}px ${borderRadii.bottom}px ${borderRadii.left}px`
+      el.style.borderRadius = `${borderRadii.topLeft}px ${borderRadii.topRight}px ${borderRadii.bottomRight}px ${borderRadii.bottomLeft}px`
     })
 }
 
@@ -109,49 +104,11 @@ const modifyRadiiAll = (els, keys, mod) => {
       const borderRadii = getBorderRadii(el)
       for(const k in borderRadii){
         borderRadii[k] += sign * mod
+        borderRadii[k] = Math.max(borderRadii[k],0)
       }
 
-      el.style.borderRadius = `${borderRadii.top}px ${borderRadii.right}px ${borderRadii.bottom}px ${borderRadii.left}px`
+      el.style.borderRadius = `${borderRadii.topLeft}px ${borderRadii.topRight}px ${borderRadii.bottomRight}px ${borderRadii.bottomLeft}px`
     })
-}
-
-const getCurrentBorder = (el) => {
-  const [t,r,b,l] = getStyle(el, 'border-width').split(' ')
-  console.log(t,r,b,l)
-  return {
-    topWidth : parseInt(getStyle(el, 'border-top-width')),
-    leftWidth : parseInt(getStyle(el, 'border-left-width')),
-    bottomWidth : parseInt(getStyle(el, 'border-bottom-width')),
-    rightWidth : parseInt(getStyle(el, 'border-right-width')),
-    style : getStyle(el, 'border-style'),
-    color : getStyle(el, 'border-color')
-  }
-}
-
-const getBorderWidths = el => {
-  const [t,r,b,l] = getStyle(el, 'border-width').split(' ')
-  const [top,right,bottom,left] = [t,r,b,l].map(function recursiveRetrieveValue(v,i,arr){
-    if(arr[i] === undefined){
-      //recursively retrieve the value at lower index as the browser condenses representation of the style
-      return recursiveRetrieveValue(undefined,(i-1)>>1,arr);
-    }
-    return parseInt(arr[i]);
-  })
-
-  return { top, right, bottom, left }
-}
-
-const getBorderRadii = el => {
-  const [t,r,b,l] = getStyle(el, 'border-radius').split(' ')
-  const [top,right,bottom,left] = [t,r,b,l].map(function recursiveRetrieveValue(v,i,arr){
-    if(arr[i] === undefined){
-      //recursively retrieve the value at lower index as the browser condenses representation of the style
-      return recursiveRetrieveValue(undefined,(i-1)>>1,arr);
-    }
-    return parseInt(arr[i]);
-  })
-
-  return { top, right, bottom, left }
 }
 
 const setStyleDefaultOrSolid = el => {

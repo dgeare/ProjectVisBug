@@ -27,6 +27,17 @@ export const getSide = direction => {
   return start
 }
 
+export const sideToCorner = direction => {
+  direction = direction.toLowerCase()
+  const corners = {
+    top : "topLeft",
+    right : "topRight",
+    bottom : "bottomRight",
+    left : "bottomLeft"
+  }
+  return corners[direction]
+}
+
 export const getNodeIndex = el => {
   return [...el.parentElement.parentElement.children]
     .indexOf(el.parentElement)
