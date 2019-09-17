@@ -13,9 +13,14 @@ const command_events = `${metaKey}+up,${metaKey}+alt+up,${metaKey}+shift+up,${me
 
 export function Border(visbug) {
   const accelerate = (fn, ctx = null) => {
+    
+    
     let last = 0
     let mod = 1
     return async (...args) => {
+      console.log(performance.now() - last);
+      last = performance.now();
+      fn.apply(ctx,  [...args,1]);return;
       if(performance.now() - last < 100){
           mod++
       }else{
